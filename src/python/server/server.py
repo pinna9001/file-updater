@@ -3,7 +3,9 @@ import select
 from time import sleep
 import hashlib
 
-# arguments: buffsize to send, source, hashalgorithm
+
+# arguments: SOURCE_TYPE=<local> REMOTE_SOURCE=<None> BUFFSIZE=<1024> HASH_ALGORITHM=<md5> 
+# ? VERSIONING=<boolean>, PRECOMPUTE_HASHES=<boolean>
 
 BUF_SIZE = 1024
 
