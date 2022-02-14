@@ -29,7 +29,6 @@ def getHashOfFile(filename):
     with open("./source/"+filename, 'rb') as f:
         while True:
             data=f.read(BUF_SIZE)
-            print(data)
             if not data:
                 break
             md5.update(data)
