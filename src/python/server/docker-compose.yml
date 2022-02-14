@@ -1,13 +1,14 @@
 services:
     app:
         build:
-            context: .
-            dockerfile: Dockerfile
+          context: .
+          dockerfile: Dockerfile
+        ports:
+          - "12345:12345"
         environment:
-            SOURCE_TYPE:"local"
-            REMOTE_SOURCE:"None"
+            SOURCE_TYPE: "local"
+            REMOTE_SOURCE: "None"
             BUFFSIZE: "1024"
-            HASH_ALGORITHM:"md5"
+            HASH_ALGORITHM: "md5"
         volumes:
             - "./directory:/app/source"
-            
