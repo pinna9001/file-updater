@@ -11,8 +11,6 @@ INSTRUCTION_FILE = 2
 
 RETURN_VALUE_FILE_DOESNT_EXIST = 8
 
-filename = "file3.txt"
-
 def getHashOfFile(filename):
     if not os.path.exists(filename):
         return None
@@ -43,33 +41,38 @@ def requestFileHash(socket, filename):
     else:
         return recv
 
-def main(directoryPath):
-    print("main")
+def checkForUpdates(directoryPath):
+    if not os.path.exists(directoryPath):
+        print("specified path does not exist. ")
+        exit()
+    relativePathToAllFiles = [os.path.relpath(os.path.join(r, file), directoryPath) for r, s, f in os.walk(directoryPath) for file in f]
+
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect(("localhost", 12345))
-    fileHash = requestFileHash(s, filename)
+    for filepath in relativePathToAllFiles:
+        filepath = filepath.replace(os.path.sep, "/")
+        fileHash = requestFileHash(s, filepath)
+        print(filepath)
+        if fileHash == None:
+            print("file doesn't exist on server. File will be deleted.")
+            os.remove(os.path.join(directoryPath, filepath))
+        elif fileHash == getHashOfFile(os.path.join(directoryPath, filepath)):
+            print("Current files are matching. Nothing will be updated.")
+        else:
+            print("Current files are not matching. The existing file will be updated.")
 
-    if fileHash == None:
-        print("file doesn't exist on server. File will be deleted.")
-        os.remove("F:/file-updater/src/python/client/"+filename)
-    elif fileHash == getHashOfFile("F:/file-updater/src/python/client/"+filename):
-        print("Current files are matching. Nothing will be updated.")
-    else:
-        print("Current files are not matching. The existing file will be updated.")
+            dataToSend = bytearray()
+            dataToSend.append(INSTRUCTION_FILE)
+            dataToSend += (filepath.encode("ascii"))
+            s.send(dataToSend)
 
-        dataToSend = bytearray()
-        dataToSend.append(INSTRUCTION_FILE)
-        dataToSend += ("file3.txt".encode("ascii"))
-        s.send(dataToSend)
+            data = s.recv(1024)
 
-        data = s.recv(1024)
+            fo = open(os.path.join(directoryPath, filepath), "wb")
 
-        fo = open("F:/file-updater/src/python/client/"+filename, "wb")
-
-        fo.write(data)
+            fo.write(data)
 
     s.close()
 
 if __name__ == "__main__":
-    print(sys.argv)
-    main(".")
+    checkForUpdates(sys.argv[1])

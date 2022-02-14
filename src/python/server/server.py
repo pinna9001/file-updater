@@ -1,6 +1,5 @@
 import socket
 import select
-from time import sleep
 import hashlib
 import sys
 import os
@@ -71,34 +70,31 @@ class Connection:
             self.state = SEND
         return False
 
-serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-serversocket.bind((socket.gethostname(), 12345))
-serversocket.listen(5)
-
-sockets = [serversocket]
-socketConnection = dict()
-
-
-
 def main():
+    serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    serversocket.bind((socket.gethostname(), 12345))
+    serversocket.listen(5)
+
+    sockets = [serversocket]
+    socketConnection = dict()
     while True:
         rdyRead, rdyWrite, inErr = select.select(sockets, sockets, [], TIME_OUT)
 
-        for socket in rdyRead:
-            if socket==serversocket:
+        for s in rdyRead:
+            if s==serversocket:
                 (clientSocket, address) = serversocket.accept()
                 sockets.append(clientSocket)
                 socketConnection[clientSocket] = Connection(clientSocket)
             else:
-                if socketConnection[socket].recv():
-                    sockets.remove(socket)
+                if socketConnection[s].recv():
+                    sockets.remove(s)
 
-        for socket in rdyWrite:
-            if socket==serversocket:
+        for s in rdyWrite:
+            if s==serversocket:
                 pass
             else:
-                socketConnection[socket].send()
+                socketConnection[s].send()
 
 if __name__ == "__main__":
     print(sys.argv)
