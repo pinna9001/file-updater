@@ -98,11 +98,7 @@ def printHelp():
     print(" -s: \tSafemode. Files that are not present on the server will not be deleted.")
     print(" -c: \tCheck only. Shows changed files, but prevents updates.")
 
-
-if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        printHelp()
-        exit()
+def parseOptions():
     for arg in sys.argv[1:]:
         if arg == "-h":
             printHelp()
@@ -111,6 +107,8 @@ if __name__ == "__main__":
             safemode = True
         elif arg == "-c":
             updating = False
+
+def checkArguments():
     if not re.match(".+:[0-9]+", sys.argv[-2]).span()[1] == len(sys.argv[-2]):
         printHelp()
         exit()
@@ -118,5 +116,12 @@ if __name__ == "__main__":
         print(sys.argv[-1], ": \n\tPath does not exist. Specify a existing path.\n")
         printHelp()
         exit()
+
+if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        printHelp()
+        exit()
+    parseOptions()
+    checkArguments()
     connectiondata = sys.argv[-2].split(":")
     checkForUpdates(sys.argv[-1], connectiondata[0], int(connectiondata[1]))

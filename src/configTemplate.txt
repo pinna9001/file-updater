@@ -1,8 +1,7 @@
 BUFF_SIZE:"1024"
-SOURCE_TYPE:"local"/"remote"
-REMOTE_SOURCE:"None"/"urlToRemoteSource"
 HASH_ALGORITHM:"md5"/...
 VERSIONS:"enabled"/"disabled"
 PRECOMPUTE_HASHES:"enabled"/"disabled"
 UPDATE_HASHES:"onFileUpdate"/"onTimer"
 UPDATE_HASHES_TIMER:"10m"/"50s"
+TIME_OUT:"60"
