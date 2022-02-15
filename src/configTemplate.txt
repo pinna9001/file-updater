@@ -2,6 +2,4 @@ BUFF_SIZE:"1024"
 HASH_ALGORITHM:"md5"/...
 VERSIONS:"enabled"/"disabled"
 PRECOMPUTE_HASHES:"enabled"/"disabled"
-UPDATE_HASHES:"onFileUpdate"/"onTimer"
-UPDATE_HASHES_TIMER:"10m"/"50s"
 TIME_OUT:"60"

@@ -4,7 +4,7 @@ import os
 import sys
 import re
 
-BUF_SIZE = 1024
+BUFF_SIZE = 1024
 
 INSTRUCTION_CLOSE = 0
 INSTRUCTION_HASH = 1
@@ -21,7 +21,7 @@ def getHashOfFile(filename):
     md5 = hashlib.md5()
     with open(filename, 'rb') as f:
         while True:
-            data=f.read(BUF_SIZE)
+            data=f.read(BUFF_SIZE)
             if not data:
                 break
             md5.update(data)
@@ -62,7 +62,7 @@ def updateFile(socket, directoryPath, filepath):
 def checkFilePathForUpdatesAvailable(socket, directoryPath, filepath):
     fileHash = requestFileHash(socket, filepath)
     if fileHash == None:
-        if safemode:
+        if safemode or not updating:
             print(filepath, " \n\tFile does not exist on server. Safemode prevented deletion...")
             return False
         else:
@@ -104,8 +104,10 @@ def parseOptions():
             printHelp()
             exit()
         elif arg == "-s":
+            global safemode
             safemode = True
-        elif arg == "-c":
+        elif arg == "-c":#
+            global updating
             updating = False
 
 def checkArguments():
@@ -123,5 +125,6 @@ if __name__ == "__main__":
         exit()
     parseOptions()
     checkArguments()
+    print(safemode, updating)
     connectiondata = sys.argv[-2].split(":")
     checkForUpdates(sys.argv[-1], connectiondata[0], int(connectiondata[1]))
