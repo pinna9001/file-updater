@@ -4,13 +4,22 @@ import os
 import sys
 import re
 
+# get from server
 BUFF_SIZE = 1024
 
 INSTRUCTION_CLOSE = 0
-INSTRUCTION_HASH = 1
-INSTRUCTION_FILE = 2
+INSTRUCTION_CONFIG = 1
+INSTRUCTION_HASH = 2
+INSTRUCTION_REQUEST_FILE = 4
+INSTRUCTION_UPDATE_FILE = 8
+INSTRUCTION_VERSIONS = 16
 
-RETURN_VALUE_FILE_DOESNT_EXIST = 8
+RETURN_VALUE_FILE_DOESNT_EXIST = 1
+RETURN_VALUE_FILE = 2
+RETURN_VALUE_FILE_END = 4
+RETURN_VALUE_HASH = 8
+RETURN_VALUE_FILE_LIST = 16
+RETURN_VALUE_VERSION_LIST = 32
 
 safemode = False
 updating = True
@@ -27,7 +36,6 @@ def getHashOfFile(filename):
             md5.update(data)
     return md5.digest()
 
-
 # returns the requested Filehash or None,
 # if the file doesnt exist on the server
 def requestFileHash(socket, filename):
@@ -36,7 +44,7 @@ def requestFileHash(socket, filename):
     dataToSend += (filename.encode("ascii"))
     socket.send(dataToSend)
 
-    recv = socket.recv(1024)
+    recv = socket.recv(1025)
     if not recv:
         print("Closed connection")
         exit()
@@ -45,7 +53,7 @@ def requestFileHash(socket, filename):
     else:
         return recv
 
-def updateFile(socket, directoryPath, filepath):
+def getFileFromServer(socket, directoryPath, filepath):
     print("\tUpdating...")
     dataToSend = bytearray()
     dataToSend.append(INSTRUCTION_FILE)
@@ -54,7 +62,7 @@ def updateFile(socket, directoryPath, filepath):
 
     fo = open(os.path.join(directoryPath, filepath), "wb")
 
-    data = socket.recv(1024)
+    data = socket.recv(1025)
 
     fo.write(data)
     print("\tDone updating")
@@ -86,18 +94,20 @@ def checkForUpdates(directoryPath, address, port):
         filepath = filepath.replace(os.path.sep, "/")
         if checkFilePathForUpdatesAvailable(s, directoryPath, filepath):
             if updating:
-                updateFile(s, directoryPath, filepath)
+                getFileFromServer(s, directoryPath, filepath)
             else:
                 print("\tUpdate prevented. Do not use the \"-c\" option to update the file.")
     s.close()
 
+# Used for main function
 def printHelp():
-    print("Usage: client.py [-h] [-s] <sourceaddress>:<port> <directory>\n")
+    print("\nUsage: client.py [-h] [-s] <sourceaddress>:<port> <directory>\n")
     print("Options:")
     print(" -h: \tPrint help.")
     print(" -s: \tSafemode. Files that are not present on the server will not be deleted.")
     print(" -c: \tCheck only. Shows changed files, but prevents updates.")
 
+# Used for mainfunction
 def parseOptions():
     for arg in sys.argv[1:]:
         if arg == "-h":
@@ -110,8 +120,10 @@ def parseOptions():
             global updating
             updating = False
 
+# Used for main function
 def checkArguments():
-    if not re.match(".+:[0-9]+", sys.argv[-2]).span()[1] == len(sys.argv[-2]):
+    match = re.match(".+:[0-9]+", sys.argv[-2])
+    if not match or match.span()[1] != len(sys.argv[-2]):
         printHelp()
         exit()
     if not os.path.exists(sys.argv[-1]):
@@ -125,6 +137,5 @@ if __name__ == "__main__":
         exit()
     parseOptions()
     checkArguments()
-    print(safemode, updating)
     connectiondata = sys.argv[-2].split(":")
     checkForUpdates(sys.argv[-1], connectiondata[0], int(connectiondata[1]))
