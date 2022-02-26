@@ -8,7 +8,7 @@ Usable to detect changed and older version files of the client. Can also used fo
 
 # future updates
 
-- [ ] advanced usage of docker to allow startup arguments and more
+- [X] ~~advanced usage of docker to allow startup arguments and more~~ configfile as a source for the used serversettings
 - [ ] versions
 - [ ] different hash fuctions
 - [ ] changeable send size for updating the files (currently the complete file will be instanty sent -> big ram spikes for the server and client programs)
