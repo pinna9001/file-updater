@@ -8,7 +8,7 @@ Usable to detect changed and older version files of the client. Can also used fo
 
 # future updates
 
-- [X] ability to update files through the client
+- [X] checking for the current versions and updating files through the client
 - [ ] passwords and usernames to allow no open access to the updated files and functions in general
 - [X] precomputed hashes
 - [X] ~~advanced usage of docker to allow startup arguments and more~~ configfile as a source for the used serversettings
